@@ -7,10 +7,11 @@ ui <- fluidPage(
     
     titlePanel("Microsoft Car Game Roulette"),
     
+    
     sidebarLayout(
         sidebarPanel(
             textInput("players",
-                         "Names of Players (separated by commas):",
+                         "Players (separated by commas):",
                          "PlayerA, PlayerB, PlayerC"),
             
             numericInput("rangeStart",
@@ -22,20 +23,26 @@ ui <- fluidPage(
                          900),
             
             textInput("tyres",
-                      "Types of tyres (separated by commas):",
+                      "Tyres (separated by commas):",
                       "Off-road, Drift, Stock, Race, Offroad, Drag"),
             
             textInput("races",
-                      "Types of races (separated by commas):",
+                      "Races (separated by commas):",
                       "Offroad, Rally, Road-race"),
             
+            textInput("car_type",
+                      "Vehicles (separated by commas, default is all):",
+                      "Buggies, Classic Muscle, Classic Racers, Classic Rally, Classic Sports Cars, Cult Cars, Drift Cars, Extreme Track Toys, GT Cars, Hot Hatch, Hypercars, Modern Muscle, Modern Rally, Modern Sports Cars, Modern Supercars, Offroad, Pickups & 4x4's, Rally Monsters, Rare Classics, Retro Hot Hatch, Retro Muscle, Retro Rally, Retro Saloons, Retro Sports Cars, Retro Super Cars, Rods and Customs, Sports Utility Heroes, Super GT, Super Hot Hatch, Super Saloons, Track Toys, Trucks, Unlimited Buggies, Unlimited Offroad, UTV's, Vans & Utility, Vintage Racers"),
+            
             br(),
-            actionButton("do", "Generate car setups!"),
-            actionButton("race", "Generate race category!"),
+            actionButton("do", "Generate setups"),
+            actionButton("car", "Generate vehicle category"),
+            actionButton("race", "Generate race category"),
         ),
         
         mainPanel(
             tableOutput("randNumbers"),
+            tableOutput("randCar"),
             tableOutput("randRace")
         )
     )
@@ -71,8 +78,18 @@ server <- function(input, output) {
         )
     })
     
+    random_car <- eventReactive(input$car, {
+        data.frame(
+            car_category = sample(unlist(strsplit(input$car_type, ",")), 1)
+        )
+    })
+    
     output$randNumbers <- renderTable({
         random_data()
+    }, rownames = FALSE, colnames = TRUE)
+    
+    output$randCar <- renderTable({
+        random_car()
     }, rownames = FALSE, colnames = TRUE)
     
     output$randRace <- renderTable({
